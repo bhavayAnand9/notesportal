@@ -34,7 +34,7 @@ exports.submitNotes = (req, res, next) => {
         })
     }
 
-    const {title, description, uploadedBy} = req.body
+    const {title, description} = req.body
     const dateUploaded = new Date();
 
     const note = new Notes({
@@ -56,7 +56,6 @@ exports.submitNotes = (req, res, next) => {
                 .catch(err => console.error(err));
             
             res.status(200).json({
-                Req_Info: 'POST req --  /notes/submit-notes -- ',
                 dataUploaded: result,
                 operation: 'successful'
             });   

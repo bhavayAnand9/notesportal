@@ -36,9 +36,6 @@ const sessionStore = new mongoDBSessionStore({
 });
 app.use(session({secret: 'notes portal ipu bhavayAnand9 nodejs  ', resave: false, saveUninitialized: false, store: sessionStore}));
 
-//session and cookies, dealing with it later
-// app.use(session({ secret: 'conduit', cookie: { maxAge: 60000 }, resave: false, saveUninitialized: false  }));
-
 //import User model
 const User = require('./model/Users');
 
@@ -59,30 +56,6 @@ app.use(errorController.get404);
 mongoose.connect(config.MONGODB_URI, { useNewUrlParser: true, useCreateIndex:true })
     .then(result => {
         console.log('Mongoose connected');
-        
-        // User.findOne().then(user => {
-        //     if(!user){
-        //         const user = new User({
-        //             name: 'bhavay',
-        //             email: 'bhavayanand9@gmail.com',
-        //             password: 'my computer',
-        //             joiningDate: new Date(),
-        //             college: 'ASET',
-        //             about: 'fucking idiot',
-        //             notesUploaded: {
-        //                 notes: []
-        //             }
-        //         });
-        //         user.save()
-        //             .then(userCreated => {
-        //                 console.log('User created: ', userCreated);
-        //             })
-        //             .catch(err => {
-        //                 console.log('User not created, error in mongoose.connect => then => user.save => catched')
-        //             })
-        //     }
-        // })
-        
         app.listen(config.PORT, (err)=>{
             if(err) throw err;
             else console.log(`Server listening to requests on PORT ${config.PORT}`)
@@ -91,5 +64,3 @@ mongoose.connect(config.MONGODB_URI, { useNewUrlParser: true, useCreateIndex:tru
     .catch(err => {
         throw err;
     });
-
-//listen for requests on port defined in config file
