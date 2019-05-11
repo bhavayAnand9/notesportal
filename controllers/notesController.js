@@ -40,7 +40,7 @@ exports.submitNotes = (req, res, next) => {
     const note = new Notes({
         title: title,
         description: description,
-        uploadedBy: req.user._id,
+        uploadedBy: req.session.user._id,
         dateUploaded: dateUploaded
     });
 
@@ -48,6 +48,7 @@ exports.submitNotes = (req, res, next) => {
         .save()
         .then(result => {
             console.log('a note submitted');
+            req.session.user.notesUploaded.notes.push(result._id);
             res.status(200).json({
                 Req_Info: 'POST req --  /notes/submit-notes -- ',
                 dataUploaded: result,

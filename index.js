@@ -9,11 +9,12 @@ const session = require('express-session');
 const fs = require('fs');
 const morgan = require('morgan');
 const cors = require('cors');
-const config = require('./config')
+const config = require('./config');
+const mongoDBSessionStore = require('connect-mongodb-session')(session);
 
 //sets view engine ejs
-app.set('view engine', 'ejs');
-app.set('views', 'views');
+// app.set('view engine', 'ejs');
+// app.set('views', 'views');
 
 //logging and monitoring using morgan
 var accessLogStream = fs.createWriteStream(path.join(__dirname, 'access.log'), { flags: 'a' })
@@ -29,32 +30,21 @@ app.use(express.static(path.join(__dirname, 'public')));
 //enable cross origin requests
 app.use(cors());
 
+const sessionStore = new mongoDBSessionStore({
+    uri: config.MONGODB_URI,
+    collection: 'sessions'
+});
+app.use(session({secret: 'notes portal ipu bhavayAnand9 nodejs  ', resave: false, saveUninitialized: false, store: sessionStore}));
+
 //session and cookies, dealing with it later
 // app.use(session({ secret: 'conduit', cookie: { maxAge: 60000 }, resave: false, saveUninitialized: false  }));
 
 //import User model
 const User = require('./model/Users');
 
-app.use((req, res, next) => {
-    User.findById('5cd6b7aaf2de7577b29d088c')
-        .then(user => {
-            console.log('user found middleware => findById => then');
-            req.user = user;
-            next(); 
-        })
-        .catch(err => {
-            console.log('user not found middleware => findById => catched');
-            res.status(404).json({
-                Comment: 'No such user found',
-                Error: err,
-                operation: 'unsuccessful'
-            })
-        })
-});
-
 //require routes here
 const userRoutes = require('./routes/user');
-const noteData = require('./routes/notes')
+const noteData = require('./routes/notes');
 
 //use routes here
 app.use('/user', userRoutes);
@@ -70,28 +60,28 @@ mongoose.connect(config.MONGODB_URI, { useNewUrlParser: true, useCreateIndex:tru
     .then(result => {
         console.log('Mongoose connected');
         
-        User.findOne().then(user => {
-            if(!user){
-                const user = new User({
-                    name: 'bhavay',
-                    email: 'bhavayanand9@gmail.com',
-                    password: 'my computer',
-                    joiningDate: new Date(),
-                    college: 'ASET',
-                    about: 'fucking idiot',
-                    notesUploaded: {
-                        notes: []
-                    }
-                });
-                user.save()
-                    .then(userCreated => {
-                        console.log('User created: ', userCreated);
-                    })
-                    .catch(err => {
-                        console.log('User not created, error in mongoose.connect => then => user.save => catched')
-                    })
-            }
-        })
+        // User.findOne().then(user => {
+        //     if(!user){
+        //         const user = new User({
+        //             name: 'bhavay',
+        //             email: 'bhavayanand9@gmail.com',
+        //             password: 'my computer',
+        //             joiningDate: new Date(),
+        //             college: 'ASET',
+        //             about: 'fucking idiot',
+        //             notesUploaded: {
+        //                 notes: []
+        //             }
+        //         });
+        //         user.save()
+        //             .then(userCreated => {
+        //                 console.log('User created: ', userCreated);
+        //             })
+        //             .catch(err => {
+        //                 console.log('User not created, error in mongoose.connect => then => user.save => catched')
+        //             })
+        //     }
+        // })
         
         app.listen(config.PORT, (err)=>{
             if(err) throw err;
@@ -100,6 +90,6 @@ mongoose.connect(config.MONGODB_URI, { useNewUrlParser: true, useCreateIndex:tru
     })
     .catch(err => {
         throw err;
-    })
+    });
 
 //listen for requests on port defined in config file
