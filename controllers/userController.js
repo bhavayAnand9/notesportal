@@ -1,3 +1,4 @@
+const bcrypt = require('bcryptjs');
 const User = require('../model/Users');
 
 exports.signupUser = (req, res, next) => {
@@ -5,15 +6,16 @@ exports.signupUser = (req, res, next) => {
     User.findOne({email: email})
         .then(user => {
             if(user){
-                res.status(409).json({
+                return res.status(409).json({
                     Error: 'Conflict happened',
                     Message: 'User already exist with the given credentials'
                 })
             } else {
+                const hashedPassword = bcrypt.hashSync(password, 12);
                 const newUser = new User({
                     name: name,
                     email: email,
-                    password: password,
+                    password: hashedPassword,
                     college: college,
                     about: about,
                     joiningDate: new Date(),
@@ -29,44 +31,46 @@ exports.signupUser = (req, res, next) => {
                             newUserInfo: userCreated
                         })
                     })
-                    .catch(err => {
-                        console.error(err);
-                    })
+                    .catch(err => console.error(err));
             }        
         })
-        .catch(err => {
-            res.status(404).json({
-                Error: err,
-                Message: 'Some error occured while creating user'
-            });
-        })
+        .catch(err => console.log(err));
 }
 
-
 exports.loginUser = (req, res, next) => {
-    User.findById('5cd6b7aaf2de7577b29d088c')
+    const { email, password } = req.body;
+    User.findOne({email: email})
     .then(user => {
-        console.log('user found middleware => findById => then');
-        req.session.user = user;
-        req.session.isLoggedIn = true;
-        req.session.save(err => {
-            if(err) res.status(500).json({Message: 'Internal server error occured with sessions', operation: 'Unsuccessful'})
-            else {
-                res.status(200).json({
-                    Req_Info: 'POST req --  /user/login -- ',
-                    userLoggedInInfo: user
-                });
-            }
-        })
+        if(!user){
+            return res.status(404).json({
+                Comment: 'No such user found',
+                operation: 'unsuccessful'
+            })
+        }
+        bcrypt.compare(password, user.password)
+            .then(doMatch => {
+                if(doMatch){
+                    req.session.user = user;
+                    req.session.isLoggedIn = true;
+                    req.session.save(err => {
+                        if(err) console.error(err);
+                        return res.status(200).json({
+                            Message: 'User logged in',
+                            operation: 'Succesful',
+                            userLoggedInInfo: user
+                        })
+                    })
+                }
+                else {
+                    res.status(404).json({
+                        Message: 'Credentials do not match',
+                        operation: 'Unsuccessful'
+                    })
+                }
+            })
+            .catch(err => console.error(err));
     })
-    .catch(err => {
-        console.log('user not found middleware => findById => catched');
-        res.status(404).json({
-            Comment: 'No such user found',
-            Error: err,
-            operation: 'unsuccessful'
-        })
-    })
+    .catch(err => console.error(err));
 }
 
 exports.logoutUser = (req, res) => {

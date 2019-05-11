@@ -1,15 +1,16 @@
-const Notes = require('../model/Notes')
+const Notes = require('../model/Notes');
+const User = require('../model/Users');
+
 
 //maybe later use select and populate functions of mongoose
 exports.getAllNotes = (req, res, next) => {
-    // if(!req.isLoggedIn) {
-    //     res.status(403).json({
-    //         Error: 'Access to that resource is forbidden',
-    //         Message: 'Please login first'
-    //     })
-    //     return ;
-    // }    
-
+    if(!req.session.isLoggedIn){
+        return res.status(404).json({
+            Error: 'Please login first on /user/login',
+            operation: 'Unsuccessful'
+        })
+    }
+    
     Notes.find({}, (err, allnotes) => {
         if(err) {
             res.status(404).json({
@@ -25,14 +26,13 @@ exports.getAllNotes = (req, res, next) => {
     })
 }
 
-exports.submitNotes = (req, res, next) => {
-    // if(!req.isLoggedIn) {
-    //     res.status(403).json({
-    //         Error: 'Access to that resource is forbidden',
-    //         Message: 'Please login first'
-    //     })
-    //     return ;
-    // }  
+exports.submitNotes = (req, res, next) => { 
+    if(!req.session.isLoggedIn){
+        return res.status(404).json({
+            Error: 'Please login first on /user/login',
+            operation: 'Unsuccessful'
+        })
+    }
 
     const {title, description, uploadedBy} = req.body
     const dateUploaded = new Date();
@@ -47,13 +47,19 @@ exports.submitNotes = (req, res, next) => {
     note
         .save()
         .then(result => {
-            console.log('a note submitted');
-            req.session.user.notesUploaded.notes.push(result._id);
+            User.findById(result.uploadedBy)
+                .then(user => {
+                    console.log(user);
+                    user.notesUploaded.notes.push(result._id);
+                    user.save();
+                })
+                .catch(err => console.error(err));
+            
             res.status(200).json({
                 Req_Info: 'POST req --  /notes/submit-notes -- ',
                 dataUploaded: result,
                 operation: 'successful'
-            });
+            });   
         })
         .catch(err => {
             res.status(500).json({
@@ -64,13 +70,12 @@ exports.submitNotes = (req, res, next) => {
 }
 
 exports.getNote = (req, res, next) => {
-    // if(!req.isLoggedIn) {
-    //     res.status(403).json({
-    //         Error: 'Access to that resource is forbidden',
-    //         Message: 'Please login first'
-    //     })
-    //     return ;
-    // }  
+    if(!req.session.isLoggedIn){
+        return res.status(404).json({
+            Error: 'Please login first on /user/login',
+            operation: 'Unsuccessful'
+        })
+    }
 
     const note_id = req.params.noteId;
     Notes.findById(note_id)
