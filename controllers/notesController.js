@@ -1,11 +1,15 @@
 const Notes = require('../model/Notes')
 
+//maybe later use select and populate functions of mongoose
 exports.getAllNotes = (req, res, next) => {
-    // data = Notes.fetchAll()
-    // res.status(200).json({
-    //     Req_Info: 'GET req --  /notes/get-notes -- ',
-    //     Notes_Data: data
-    // })
+    // if(!req.isLoggedIn) {
+    //     res.status(403).json({
+    //         Error: 'Access to that resource is forbidden',
+    //         Message: 'Please login first'
+    //     })
+    //     return ;
+    // }    
+
     Notes.find({}, (err, allnotes) => {
         if(err) {
             res.status(404).json({
@@ -22,6 +26,14 @@ exports.getAllNotes = (req, res, next) => {
 }
 
 exports.submitNotes = (req, res, next) => {
+    // if(!req.isLoggedIn) {
+    //     res.status(403).json({
+    //         Error: 'Access to that resource is forbidden',
+    //         Message: 'Please login first'
+    //     })
+    //     return ;
+    // }  
+
     const {title, description, uploadedBy} = req.body
     const dateUploaded = new Date();
 
@@ -51,19 +63,15 @@ exports.submitNotes = (req, res, next) => {
 }
 
 exports.getNote = (req, res, next) => {
+    // if(!req.isLoggedIn) {
+    //     res.status(403).json({
+    //         Error: 'Access to that resource is forbidden',
+    //         Message: 'Please login first'
+    //     })
+    //     return ;
+    // }  
+
     const note_id = req.params.noteId;
-    // Notes.getById(note_id, (err, note)=> {
-    //     if(err) {
-    //         res.status(404).json({
-    //             'Error': err
-    //         })
-    //     }
-    //     else {
-    //         res.status(200).json({
-    //             note
-    //         });
-    //     }
-    // })
     Notes.findById(note_id)
         .then(note => {
             res.status(200).json({
