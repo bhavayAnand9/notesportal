@@ -1,16 +1,8 @@
 const Notes = require('../model/Notes');
 const User = require('../model/Users');
 
-
 //maybe later use select and populate functions of mongoose
 exports.getAllNotes = (req, res, next) => {
-    if(!req.session.isLoggedIn){
-        return res.status(404).json({
-            Error: 'Please login first on /user/login',
-            operation: 'Unsuccessful'
-        })
-    }
-    
     Notes.find({}, (err, allnotes) => {
         if(err) {
             res.status(404).json({
@@ -27,13 +19,6 @@ exports.getAllNotes = (req, res, next) => {
 }
 
 exports.submitNotes = (req, res, next) => { 
-    if(!req.session.isLoggedIn){
-        return res.status(404).json({
-            Error: 'Please login first on /user/login',
-            operation: 'Unsuccessful'
-        })
-    }
-
     const {title, description} = req.body
     const dateUploaded = new Date();
 
@@ -69,13 +54,6 @@ exports.submitNotes = (req, res, next) => {
 }
 
 exports.getNote = (req, res, next) => {
-    if(!req.session.isLoggedIn){
-        return res.status(404).json({
-            Error: 'Please login first on /user/login',
-            operation: 'Unsuccessful'
-        })
-    }
-
     const note_id = req.params.noteId;
     Notes.findById(note_id)
         .then(note => {

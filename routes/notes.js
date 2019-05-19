@@ -4,14 +4,15 @@ const express = require('express');
 const router = express.Router();
 const path = require('path');
 const notesController = require('../controllers/notesController');
+const isAuth = require('../middleware/is-auth');
 
 // /notes/get-notes => GET
-router.get('/get-all-notes', notesController.getAllNotes);
+router.get('/get-all-notes',isAuth, notesController.getAllNotes);
 
 
 // /notes/submit-notes => POST
-router.post('/submit-notes', notesController.submitNotes)
+router.post('/submit-notes', isAuth, notesController.submitNotes)
 
-router.get('/get-notes/:noteId', notesController.getNote);
+router.get('/get-notes/:noteId', isAuth, notesController.getNote);
 
 exports.routes = router;
