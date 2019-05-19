@@ -11,6 +11,7 @@ const morgan = require('morgan');
 const cors = require('cors');
 const config = require('./config');
 const mongoDBSessionStore = require('connect-mongodb-session')(session);
+const multer = require('multer');
 
 //sets view engine ejs
 // app.set('view engine', 'ejs');
@@ -23,6 +24,8 @@ app.use(morgan('combined', { stream: accessLogStream }))
 //parsing req objects using body parser
 // app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+
+app.use(multer({dest:"uploads"}).single('document'))
 
 //set public dir for serving static files
 app.use(express.static(path.join(__dirname, 'public')));

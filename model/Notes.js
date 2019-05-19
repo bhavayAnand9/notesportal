@@ -21,6 +21,9 @@ const notesSchema = new Schema({
     dateUploaded: {
         type: Date,
         required: true
+    },
+    notesPath: {
+        type: String
     }
 })
 
