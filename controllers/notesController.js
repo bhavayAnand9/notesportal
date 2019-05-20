@@ -1,6 +1,8 @@
 const Notes = require('../model/Notes');
 const User = require('../model/Users');
 const path = require('path');
+const fs = require('fs');
+
 //maybe later use select and populate functions of mongoose
 exports.getAllNotes = (req, res, next) => {
     Notes.find({}, (err, allnotes) => {
@@ -22,15 +24,15 @@ exports.submitNotes = (req, res, next) => {
     const {title, description} = req.body
     const dateUploaded = new Date();
     const document = req.file;
-
     if(!document){
+        fs.unlinkSync(path.resolve(__dirname + '/../' + document.path));
         res.status(404).json({
-            Error: 'Attached file is corrupted'
+            Error: 'file is corrupted'
+
         })
     }
 
     const docPath = document.path;
-    console.log(docPath);
     const note = new Notes({
         title: title,
         description: description,
@@ -55,6 +57,7 @@ exports.submitNotes = (req, res, next) => {
             });   
         })
         .catch(err => {
+            fs.unlinkSync(path.resolve(__dirname + '/../' + document.path));
             res.status(500).json({
                 Error: err,
                 operation: 'unsuccessful'
@@ -71,6 +74,7 @@ exports.getNote = (req, res, next) => {
             // })
             // res.status(200).sendFile(note.notesPath);
             res.sendFile(path.resolve(__dirname + '/../' + note.notesPath));
+            // const invoicePath = 
         })
         .catch(err => {
             res.status(500).json({
