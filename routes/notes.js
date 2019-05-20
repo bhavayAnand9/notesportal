@@ -13,6 +13,7 @@ router.get('/get-all-notes',isAuth, notesController.getAllNotes);
 // /notes/submit-notes => POST
 router.post('/submit-notes', isAuth, notesController.submitNotes)
 
-router.get('/get-notes/:noteId', isAuth, notesController.getNote);
+// router.get('/get-notes/:noteId', isAuth, notesController.getNote);
+router.get('/get-notes/:noteId', notesController.getNote);
 
 exports.routes = router;

@@ -1,6 +1,6 @@
 const Notes = require('../model/Notes');
 const User = require('../model/Users');
-const path = require('path');
+const node_path = require('path');
 const fs = require('fs');
 
 //maybe later use select and populate functions of mongoose
@@ -24,21 +24,20 @@ exports.submitNotes = (req, res, next) => {
     const {title, description} = req.body
     const dateUploaded = new Date();
     const document = req.file;
+    console.log(document);
     if(!document){
-        fs.unlinkSync(path.resolve(__dirname + '/../' + document.path));
-        res.status(404).json({
-            Error: 'file is corrupted'
-
+        fs.unlinkSync(node_path.resolve(__dirname + '/../' + document.path));
+        return res.status(404).json({
+            Error: 'file is corrupted',
+            operation: 'unsuccessful'
         })
     }
 
-    const docPath = document.path;
     const note = new Notes({
         title: title,
         description: description,
         uploadedBy: req.session.user._id,
         dateUploaded: dateUploaded,
-        notesPath: docPath
     });
 
     note
@@ -51,14 +50,20 @@ exports.submitNotes = (req, res, next) => {
                 })
                 .catch(err => console.error(err));
             
+            try{    
+                fs.renameSync(node_path.resolve(__dirname + '/../' + document.path), node_path.resolve(__dirname + '/../' + 'uploads/' + result._id + '.pdf'));
+            }
+            catch(e){
+                return res.status(404).json({e});
+            }    
             res.status(200).json({
                 dataUploaded: result,
                 operation: 'successful'
             });   
         })
         .catch(err => {
-            fs.unlinkSync(path.resolve(__dirname + '/../' + document.path));
-            res.status(500).json({
+            fs.unlinkSync(node_path.resolve(__dirname + '/../' + document.path));
+            return res.status(500).json({
                 Error: err,
                 operation: 'unsuccessful'
             })
@@ -67,14 +72,16 @@ exports.submitNotes = (req, res, next) => {
 
 exports.getNote = (req, res, next) => {
     const note_id = req.params.noteId;
+    console.log(note_id)
     Notes.findById(note_id)
         .then(note => {
-            // res.status(200).json({
-            //     note
-            // })
-            // res.status(200).sendFile(note.notesPath);
-            res.sendFile(path.resolve(__dirname + '/../' + note.notesPath));
-            // const invoicePath = 
+            const file = fs.createReadStream(__dirname + '/../' + 'uploads/' + note_id + '.pdf');
+            res.setHeader('Content-Type', 'application/pdf');
+            res.setHeader(
+                'Content-Disposition',
+                'inline; filename="' + note.title + '"'
+            );
+            file.pipe(res);
         })
         .catch(err => {
             res.status(500).json({

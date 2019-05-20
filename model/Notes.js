@@ -22,9 +22,9 @@ const notesSchema = new Schema({
         type: Date,
         required: true
     },
-    notesPath: {
-        type: String
-    }
+    // notesPath: {
+    //     type: String
+    // }
 })
 
 module.exports = mongoose.model('Notes', notesSchema);
