@@ -33,8 +33,8 @@ exports.signupUser = (req, res, next) => {
                 newUser.save()
                     .then(userCreated => {
                         res.status(200).json({
-                            Message: 'User created',
-                            operation: 'Successful',
+                            Message: 'user created',
+                            operation: 'successful',
                             newUserInfo: userCreated
                         })
 

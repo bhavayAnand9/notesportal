@@ -67,3 +67,5 @@ mongoose.connect(config.MONGODB_URI, { useNewUrlParser: true, useCreateIndex:tru
     .catch(err => {
         throw err;
     });
+
+module.exports = app;
