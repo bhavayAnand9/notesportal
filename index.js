@@ -59,10 +59,10 @@ app.use(errorController.get404);
 
 
 
-mongoose.connect(process.env.PORT || config.MONGODB_URI, { useNewUrlParser: true, useCreateIndex:true })
+mongoose.connect(config.MONGODB_URI, { useNewUrlParser: true, useCreateIndex:true })
     .then(result => {
         console.log('Mongoose connected');
-        const server = app.listen(config.PORT, (err)=>{
+        const server = app.listen(process.env.PORT || config.PORT, (err)=>{
             if(err) throw err;
             else console.log(`Server listening to requests on PORT ${config.PORT}`)
         });
