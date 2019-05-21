@@ -69,22 +69,40 @@ exports.submitNotes = (req, res, next) => {
         });
 }
 
-exports.getNote = (req, res, next) => {
+exports.getNote = async (req, res, next) => {
     const note_id = req.params.noteId;
-    Notes.findById(note_id)
-        .then(note => {
-            const file = fs.createReadStream(node_path.resolve(__dirname + '/../' + 'uploads/' + note_id + '.pdf'));
-            res.setHeader('Content-Type', 'application/pdf');
-            res.setHeader(
-                'Content-Disposition',
-                'inline; filename="' + note.title + '"'
-            );
-            file.pipe(res);
-        })
-        .catch(err => {
+    // const note = await Notes.findById(note_id);
+    try{
+        await fs.promises.access(node_path.resolve(__dirname + '/../' + 'uploads/' + note_id + '.pdf'));
+        const file = await fs.createReadStream(node_path.resolve(__dirname + '/../' + 'uploads/' + note_id + '.pdf'))
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader(
+            'Content-Disposition',
+            'inline; filename="' + note.title + '"'
+        );
+        file.pipe(res);
+    } catch (err) {
             res.status(500).json({
                 Error: 'no notes found',
                 operation: 'unsuccessful'
-            })
-        })
+            });
+    }    
+
+
+    // Notes.findById(note_id)
+    //     .then(note => {
+    //         const file = fs.createReadStream(node_path.resolve(__dirname + '/../' + 'uploads/' + note_id + '.pdf'));
+    //         res.setHeader('Content-Type', 'application/pdf');
+    //         res.setHeader(
+    //             'Content-Disposition',
+    //             'inline; filename="' + note.title + '"'
+    //         );
+    //         file.pipe(res);
+    //     })
+    //     .catch(err => {
+    //         res.status(500).json({
+    //             Error: 'no notes found',
+    //             operation: 'unsuccessful'
+    //         })
+    //     })
 }
