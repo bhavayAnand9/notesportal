@@ -73,7 +73,7 @@ exports.getNote = (req, res, next) => {
     const note_id = req.params.noteId;
     Notes.findById(note_id)
         .then(note => {
-            const file = fs.createReadStream(__dirname + '/../' + 'uploads/' + note_id + '.pdf');
+            const file = fs.createReadStream(node_path.resolve(__dirname + '/../' + 'uploads/' + note_id + '.pdf'));
             res.setHeader('Content-Type', 'application/pdf');
             res.setHeader(
                 'Content-Disposition',
