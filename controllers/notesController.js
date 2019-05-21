@@ -25,7 +25,7 @@ exports.submitNotes = (req, res, next) => {
     const dateUploaded = new Date();
     const document = req.file;
     console.log(document);
-    if(!document){
+    if(!document || document.mimetype !== 'application/pdf'){
         fs.unlinkSync(node_path.resolve(__dirname + '/../' + document.path));
         return res.status(404).json({
             Error: 'file is corrupted',
@@ -36,7 +36,7 @@ exports.submitNotes = (req, res, next) => {
     const note = new Notes({
         title: title,
         description: description,
-        uploadedBy: req.session.user._id,
+        uploadedBy: req.loggedInUserId,
         dateUploaded: dateUploaded,
     });
 

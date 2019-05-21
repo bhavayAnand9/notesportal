@@ -5,12 +5,12 @@ const app = express();
 const path = require('path');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
-const session = require('express-session');
 const fs = require('fs');
 const morgan = require('morgan');
 const cors = require('cors');
 const config = require('./config');
-const mongoDBSessionStore = require('connect-mongodb-session')(session);
+// const mongoDBSessionStore = require('connect-mongodb-session')(session);
+const session = require('express-session');
 const multer = require('multer');
 
 //sets view engine ejs
@@ -33,11 +33,11 @@ app.use(express.static(path.join(__dirname, 'public')));
 //enable cross origin requests
 app.use(cors());
 
-const sessionStore = new mongoDBSessionStore({
-    uri: config.MONGODB_URI,
-    collection: 'sessions'
-});
-app.use(session({secret: 'notes portal ipu bhavayAnand9 nodejs  ', resave: false, saveUninitialized: false, store: sessionStore}));
+// const sessionStore = new mongoDBSessionStore({
+//     uri: config.MONGODB_URI,
+//     collection: 'sessions'
+// });
+// app.use(session({secret: 'notes portal ipu bhavayAnand9 nodejs  ', resave: false, saveUninitialized: false, store: sessionStore}));
 
 //import User model
 const User = require('./model/Users');

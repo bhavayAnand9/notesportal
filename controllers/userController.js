@@ -3,6 +3,7 @@ const User = require('../model/Users');
 const sgMail = require('@sendgrid/mail');
 const crypto = require('crypto');
 const config = require('../config');
+const jwt = require('jsonwebtoken');
 
 sgMail.setApiKey(config.sendGrid_API_key);
 
@@ -67,15 +68,17 @@ exports.loginUser = (req, res, next) => {
         bcrypt.compare(password, user.password)
             .then(doMatch => {
                 if(doMatch){
-                    req.session.user = user;
-                    req.session.isLoggedIn = true;
-                    req.session.save(err => {
-                        if(err) console.error(err);
-                        return res.status(200).json({
-                            Message: 'User logged in',
-                            operation: 'Succesful',
-                            userLoggedInInfo: user
-                        })
+
+                    const token = jwt.sign({
+                        email: user.email,
+                        userId: user._id.toString()
+                    }, config.SECRET_KEY, { expiresIn: '1h' });
+
+                    return res.status(200).json({
+                        Message: 'User logged in',
+                        operation: 'Succesful',
+                        token: token,
+                        userLoggedInInfo: user
                     })
                 }
                 else {
