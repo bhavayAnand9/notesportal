@@ -9,6 +9,7 @@ const fs = require('fs');
 const morgan = require('morgan');
 const cors = require('cors');
 const config = require('./config');
+const helmet = require('helmet');
 // const mongoDBSessionStore = require('connect-mongodb-session')(session);
 const session = require('express-session');
 const multer = require('multer');
@@ -38,6 +39,8 @@ app.use(cors());
 //     collection: 'sessions'
 // });
 // app.use(session({secret: 'notes portal ipu bhavayAnand9 nodejs  ', resave: false, saveUninitialized: false, store: sessionStore}));
+
+app.use(helmet());
 
 //import User model
 const User = require('./model/Users');

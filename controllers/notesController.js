@@ -24,7 +24,6 @@ exports.submitNotes = (req, res, next) => {
     const {title, description} = req.body
     const dateUploaded = new Date();
     const document = req.file;
-    console.log(document);
     if(!document || document.mimetype !== 'application/pdf'){
         fs.unlinkSync(node_path.resolve(__dirname + '/../' + document.path));
         return res.status(404).json({
@@ -48,7 +47,7 @@ exports.submitNotes = (req, res, next) => {
                     user.notesUploaded.notes.push(result._id);
                     user.save();
                 })
-                .catch(err => console.error(err));
+                .catch(err => res.status(500).json(err));
             
             try{    
                 fs.renameSync(node_path.resolve(__dirname + '/../' + document.path), node_path.resolve(__dirname + '/../' + 'uploads/' + result._id + '.pdf'));
@@ -72,7 +71,6 @@ exports.submitNotes = (req, res, next) => {
 
 exports.getNote = (req, res, next) => {
     const note_id = req.params.noteId;
-    console.log(note_id)
     Notes.findById(note_id)
         .then(note => {
             const file = fs.createReadStream(__dirname + '/../' + 'uploads/' + note_id + '.pdf');

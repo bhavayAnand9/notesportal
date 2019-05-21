@@ -48,11 +48,11 @@ exports.signupUser = (req, res, next) => {
                         sgMail.send(msg);
 
                     })
-                    .catch(err => console.error(err));
+                    .catch(err => res.status(500).json(err));
 
             }        
         })
-        .catch(err => console.log(err));
+        .catch(err => res.status(500).json(err));
 }
 
 exports.loginUser = (req, res, next) => {
@@ -88,9 +88,9 @@ exports.loginUser = (req, res, next) => {
                     })
                 }
             })
-            .catch(err => console.error(err));
+            .catch(err => res.status(500).json(err));
     })
-    .catch(err => console.error(err));
+    .catch(err => res.status(500).json(err));
 }
 
 exports.logoutUser = (req, res) => {
@@ -145,7 +145,7 @@ exports.resetPasswordMail = (req, res) => {
             })
             .catch(err => {
                 // if(err)  res.status(404).json({err});
-                if(err)  console.error(err);
+                if(err)  res.status(500).json(err);
             })
     })
 }
