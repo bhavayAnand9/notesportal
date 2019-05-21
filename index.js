@@ -59,10 +59,15 @@ app.use(errorController.get404);
 mongoose.connect(config.MONGODB_URI, { useNewUrlParser: true, useCreateIndex:true })
     .then(result => {
         console.log('Mongoose connected');
-        app.listen(config.PORT, (err)=>{
+        const server = app.listen(config.PORT, (err)=>{
             if(err) throw err;
             else console.log(`Server listening to requests on PORT ${config.PORT}`)
         });
+        const io = require('socket.io')(server);
+        io.on('connection', socket => {
+            console.log('client connected');
+            console.log(socket);
+        })
     })
     .catch(err => {
         throw err;
